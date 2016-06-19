@@ -49,7 +49,6 @@ targetPath=$1;
 
 if [ -n "$targetPath" ] && [ -d $targetPath ]; then
 
-	isValidResponse=false
 	name=$(basename $targetPath);
 	themeName='';
 	themeVersion=0;
@@ -65,48 +64,24 @@ if [ -n "$targetPath" ] && [ -d $targetPath ]; then
 
 	echo "Found $themeVersion of $themeName in ./$name";
 
-	read -r -p "Do you want to continue? [y/N] " response;
-	if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
-		echo "Okay, moving on.";
-		isValidResponse=true;
-	else
-		while [[ -z "$response" || false = "$isValidResponse" ]]; do
-			echo "Didn't catch that...";
-			read -r -p "Do you want to continue? [y/N] " response;
-			if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]; then
-				echo "Okay, moving on.";
-				isValidResponse=true;
-			elif [[ -n "$response" ]]; then
-				echo "Alright, bye!";
-				break;
-			fi
-		done
-	fi
+	# copy the theme to the distribution directory
+	echo "Copying ./$name to dist/$name";
+	sudo cp -r ./$name dist/$name;
 
-	# the rest of the program
-	if [[ true = "$isValidResponse" ]]; then
+	# remove the unnecessary development files
+	echo "Removing unnecessary files";
+	sudo rm -r dist/$name/{.git,.gitignore,.DS_Store,*/.DS_Store,*/*/.DS_Store,sass,js/src} 2>/dev/null;
+	
+	# zip up the theme using the version number
+	cd dist;
+	echo "Zipping the theme up";
+	zip -rq $name-$themeVersion.zip $name/;
+	cd ..;
+	
+	echo "Removing theme copy in dist/ directory";
+	sudo rm -r dist/$name;
 
-		# copy the theme to the distribution directory
-		echo "Copying ./$name to dist/$name";
-		sudo cp -r ./$name dist/$name;
-
-		# remove the unnecessary development files
-		echo "Removing unnecessary files";
-		sudo rm -r dist/$name/{.git,.gitignore,.DS_Store,*/.DS_Store,*/*/.DS_Store,sass,js/src} 2>/dev/null;
-		
-		# zip up the theme using the version number
-		cd dist;
-		echo "Zipping the theme up";
-		zip -rq $name-$themeVersion.zip $name/;
-		cd ..;
-		
-		echo "Removing theme copy in dist/ directory";
-		sudo rm -r dist/$name;
-
-		echo "All done. Version $themeVersion of $themeName is ready to be deployed";
-	else
-		echo "Nothing happened.";
-	fi
+	echo "All done. Version $themeVersion of $themeName is ready to be deployed";
 else
 	echo "Make sure the provided directory path exists in or below the current directory, the provided path was: \"$targetPath\"";
 fi
