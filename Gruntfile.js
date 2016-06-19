@@ -39,7 +39,7 @@ module.exports = function( grunt ) {
 		exec: {
 			build: {
 				cmd: function () {
-					return "source theme_zip.sh <%= paths.rel %>";
+					return "source theme_zip.sh " + grunt.template.process( "<%= paths.rel %>" );
 				}
 			}
 		},
