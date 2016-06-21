@@ -72,7 +72,7 @@ module.exports = function( grunt ) {
 				files: [{
 					expand: true,
 					cwd: '<%= paths.sass.dir %>',
-					src: ['**/*.scss'],
+					src: ['*.scss', '**/*.scss'],
 					dest: '<%= paths.rel %>',
 					ext: '.css'
 				}]
@@ -151,4 +151,7 @@ module.exports = function( grunt ) {
 	grunt.registerTask( 'ugly-js', [ 'uglify:src' ] );
 	grunt.registerTask( 'lint', [ 'phplint', 'jshint:scripts' ] );
 	grunt.registerTask( 'lint-grunt', [ 'jshint:gruntfile' ] );
+
+	// default behavior
+	grunt.registerTask( 'default', 'dev' );
 };
